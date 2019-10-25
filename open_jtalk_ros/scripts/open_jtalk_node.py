@@ -5,6 +5,7 @@ Speak string topic by open_jtalk
 """
 
 import rospy
+import rospkg
 from std_msgs.msg import String
 import subprocess
 
@@ -18,7 +19,7 @@ class OpenJtalkROS(object):
 
         open_jtalk = ['open_jtalk']
         mech = ['-x', '/var/lib/mecab/dic/open-jtalk/naist-jdic']
-        htsvoice= ['-m', '/usr/local/share/hts-voice/htsvoice-tohoku-f01/tohoku-f01-happy.htsvoice']
+        htsvoice= ['-m', rospkg.RosPack().get_path("open_jtalk_ros")+'/hts-voice/htsvoice-tohoku-f01/tohoku-f01-happy.htsvoice']
         speed = ['-r', '1.0']
         #outwav = ['-ow', '/dev/stdout']
         outwav = ['-ow', '/tmp/open_jtalk.wav']
