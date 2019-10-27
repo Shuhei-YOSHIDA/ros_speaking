@@ -7,9 +7,14 @@ Speak string topic by open_jtalk
 import rospy
 import rospkg
 from std_msgs.msg import String
+from open_jtalk_ros.msg import Words
 import subprocess
 
 def openjtalk(message, voicefilepath, speak_speed=1.0):
+    if speak_speed < 0.1: #speak_speed = 0 is dangerous
+        rospy.logwarn("Too low speak_speed %s is set, then reset to default", speak_speed)
+        speak_speed = 1.0;
+
     open_jtalk = ['open_jtalk']
     dictionarydir= ['-x', '/var/lib/mecab/dic/open-jtalk/naist-jdic']
     htsvoice= ['-m', voicefilepath]
@@ -39,8 +44,14 @@ class OpenJtalkROS(object):
 
         openjtalk(data.data, self.voicefilepath)
 
+    def __wordsSpeaker(self, data):
+        rospy.loginfo("openjtalk says: %s", data.words)
+
+        openjtalk(data.words, data.voice_data_path, data.voice_speed)
+
     def run(self):
         rospy.Subscriber("chatter", String, self.__speaker, queue_size=1)
+        rospy.Subscriber("words", Words, self.__wordsSpeaker, queue_size=1)
         rospy.spin()
 
 if __name__ == '__main__':
