@@ -14,17 +14,17 @@ def openjtalk(message, voicefilepath, speak_speed=1.0):
     dictionarydir= ['-x', '/var/lib/mecab/dic/open-jtalk/naist-jdic']
     htsvoice= ['-m', voicefilepath]
     speed = ['-r', str(speak_speed)]
-    #outwav = ['-ow', '/dev/stdout']
-    outwav = ['-ow', '/tmp/open_jtalk.wav']
-    cmd = open_jtalk+dictionarydir+htsvoice+speed+outwav
+    outwav = ['-ow', '/dev/stdout']
+    cmd_jtalk = open_jtalk+dictionarydir+htsvoice+speed+outwav
 
-    c = subprocess.Popen(cmd, stdin=subprocess.PIPE)
-    c.stdin.write(message)
-    c.stdin.close()
-    c.wait()
-    aplay = ['aplay', '-q', '/tmp/open_jtalk.wav']
-    wr = subprocess.Popen(aplay)
-    wr.wait()
+    aplay = ['aplay', '-q']
+
+    p1 = subprocess.Popen(cmd_jtalk, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    p2 = subprocess.Popen(aplay, stdin=p1.stdout)
+    p1.stdin.write(message)
+    p1.stdin.close()
+    p1.wait()
+    p2.wait()
 
     return;
 
