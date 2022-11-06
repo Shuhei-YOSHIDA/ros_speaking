@@ -13,13 +13,13 @@ import subprocess
 
 
 def openjtalk(message, voicefilepath, speak_speed=1.0):
-    if speak_speed < 0.1: #speak_speed = 0 is dangerous
+    if speak_speed < 0.1:  # speak_speed = 0 is dangerous
         rospy.logwarn("Too low speak_speed %s is set, then reset to default", speak_speed)
         speak_speed = 1.0
 
     open_jtalk = ['open_jtalk']
-    dictionarydir= ['-x', '/var/lib/mecab/dic/open-jtalk/naist-jdic']
-    htsvoice= ['-m', voicefilepath]
+    dictionarydir = ['-x', '/var/lib/mecab/dic/open-jtalk/naist-jdic']
+    htsvoice = ['-m', voicefilepath]
     speed = ['-r', str(speak_speed)]
     outwav = ['-ow', '/dev/stdout']
     cmd_jtalk = open_jtalk+dictionarydir+htsvoice+speed+outwav
@@ -29,15 +29,15 @@ def openjtalk(message, voicefilepath, speak_speed=1.0):
     p1 = subprocess.Popen(cmd_jtalk, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     p2 = subprocess.Popen(aplay, stdin=p1.stdout)
     try:
-        p1.stdin.write(message.encode()) # For python3(noetic)
+        p1.stdin.write(message.encode())  # For python3(noetic)
     except Exception as e:
-        rospy.logdebug('open_jtalk_ros in ROS melodic')
-        p1.stdin.write(message) # For python2(melodic)
+        rospy.logdebug('open_jtalk_ros in ROS melodic:', e)
+        p1.stdin.write(message)  # For python2(melodic)
     p1.stdin.close()
     p1.wait()
     p2.wait()
 
-    return;
+    return
 
 
 class OpenJtalkROS(object):
@@ -58,7 +58,7 @@ class OpenJtalkROS(object):
         openjtalk(data.words, data.voice_data_path, data.voice_speed)
 
     def __setVoiceData(self, req):
-        self.voicefilepath = req.voice_data_path # check validity of path
+        self.voicefilepath = req.voice_data_path  # check validity of path
         self.voice_speed = req.voice_speed
 
         return SetVoiceDataResponse()
@@ -71,9 +71,10 @@ class OpenJtalkROS(object):
 
         rospy.spin()
 
+
 if __name__ == '__main__':
     try:
         open_jtalk_ros = OpenJtalkROS()
         open_jtalk_ros.run()
-    except rospy.ROSInterruptException :
+    except rospy.ROSInterruptException:
         pass
