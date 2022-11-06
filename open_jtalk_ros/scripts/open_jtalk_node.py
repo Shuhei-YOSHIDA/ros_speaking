@@ -11,10 +11,11 @@ from open_jtalk_ros.msg import Words
 from open_jtalk_ros.srv import *
 import subprocess
 
+
 def openjtalk(message, voicefilepath, speak_speed=1.0):
     if speak_speed < 0.1: #speak_speed = 0 is dangerous
         rospy.logwarn("Too low speak_speed %s is set, then reset to default", speak_speed)
-        speak_speed = 1.0;
+        speak_speed = 1.0
 
     open_jtalk = ['open_jtalk']
     dictionarydir= ['-x', '/var/lib/mecab/dic/open-jtalk/naist-jdic']
@@ -27,7 +28,11 @@ def openjtalk(message, voicefilepath, speak_speed=1.0):
 
     p1 = subprocess.Popen(cmd_jtalk, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     p2 = subprocess.Popen(aplay, stdin=p1.stdout)
-    p1.stdin.write(message)
+    try:
+        p1.stdin.write(message.encode()) # For python3(noetic)
+    except Exception as e:
+        rospy.logdebug('open_jtalk_ros in ROS melodic')
+        p1.stdin.write(message) # For python2(melodic)
     p1.stdin.close()
     p1.wait()
     p2.wait()
