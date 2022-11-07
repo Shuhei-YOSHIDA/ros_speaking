@@ -44,7 +44,9 @@ class OpenJtalkROS(object):
     def __init__(self, ):
         rospy.init_node('open_jtalk_ros_node', anonymous=False)
         rospy.loginfo("start speaking")
-        self.voicefilepath = rospkg.RosPack().get_path("open_jtalk_ros")+'/hts-voice/htsvoice-tohoku-f01/tohoku-f01-neutral.htsvoice'
+        self.voicefilepath = \
+            rospkg.RosPack().get_path("open_jtalk_ros")\
+            + '/hts-voice/htsvoice-tohoku-f01/tohoku-f01-neutral.htsvoice'
         self.voice_speed = 1.0
 
     def __speaker(self, data):
@@ -63,11 +65,27 @@ class OpenJtalkROS(object):
 
         return SetVoiceDataResponse()
 
+    def __makeVoice(self, req):
+        voicefilepath = req.voice_data_path
+        voice_speed = req.voice_speed
+
+        if voicefilepath == '':
+            voicefilepath = \
+                    rospkg.RosPack().get_path("open_jtalk_ros")\
+                    + '/hts-voice/htsvoice-tohoku-f01/tohoku-f01-neutral.htsvoice'
+        if voice_speed <= 0:
+            voice_speed = 1.0
+
+        openjtalk(req.text, voicefilepath, voice_speed)
+
+        return MakeVoiceResponse()
+
     def run(self):
         rospy.Subscriber("chatter", String, self.__speaker, queue_size=1)
         rospy.Subscriber("words", Words, self.__wordsSpeaker, queue_size=1)
 
         rospy.Service('set_voice_data', SetVoiceData, self.__setVoiceData)
+        rospy.Service('make_voice', MakeVoice, self.__makeVoice)
 
         rospy.spin()
 

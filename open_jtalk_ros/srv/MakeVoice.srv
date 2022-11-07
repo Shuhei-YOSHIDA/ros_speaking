@@ -1,0 +1,5 @@
+string text
+# If empty, default value is used
+string voice_data_path
+float32 voice_speed
+----
