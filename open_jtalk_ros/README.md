@@ -9,6 +9,7 @@ However, several materials are licensed under other licenses.
 $ cd catkin_ws/src
 $ git clone --recursive https://github.com/Shuhei-YOSHIDA/ros_speaking.git
 $ sudo apt install open-jtalk open-jtalk-mecab-naist-jdic hts-voice-nitech-jp-atr503-m001
+$ sudo apt install alsa-utils # For aplay command
 $ catkin build
 ```
 
